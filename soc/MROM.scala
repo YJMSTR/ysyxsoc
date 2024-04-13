@@ -12,15 +12,15 @@ class MROMHelper extends BlackBox with HasBlackBoxInline {
   val io = IO(new Bundle {
     val raddr = Input(UInt(32.W))
     val ren = Input(Bool())
-    val rdata = Output(UInt(32.W))
+    val rdata = Output(UInt(64.W))
   })
   setInline("MROMHelper.v",
     """module MROMHelper(
       |  input [31:0] raddr,
       |  input ren,
-      |  output reg [31:0] rdata
+      |  output reg [63:0] rdata
       |);
-      |import "DPI-C" function void mrom_read(input int raddr, output int rdata);
+      |import "DPI-C" function void mrom_read(input int raddr, output longint rdata);
       |always @(*) begin
       |  if (ren) mrom_read(raddr, rdata);
       |  else rdata = 0;
@@ -58,9 +58,10 @@ class AXI4MROM(address: Seq[AddressSet])(implicit p: Parameters) extends LazyMod
     mrom.io.raddr := in.ar.bits.addr
     mrom.io.ren := in.ar.fire
     in.ar.ready := (state === stateIdle)
-    assert(!(in.ar.fire && in.ar.bits.size === 3.U), "do not support 8 byte transfter")
+    // assert(!(in.ar.fire && in.ar.bits.size === 3.U), "do not support 8 byte transfter")
 
-    in.r.bits.data := RegEnable(Fill(2, mrom.io.rdata), in.ar.fire)
+    // in.r.bits.data := RegEnable(Fill(2, mrom.io.rdata), in.ar.fire)
+    in.r.bits.data := RegEnable(mrom.io.rdata, in.ar.fire)
     in.r.bits.id := RegEnable(in.ar.bits.id, in.ar.fire)
     in.r.bits.resp := 0.U
     in.r.bits.last := true.B

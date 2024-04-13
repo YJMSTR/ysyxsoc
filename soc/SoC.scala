@@ -81,6 +81,12 @@ class ysyxSoCASIC(hasChipLink: Boolean)(implicit p: Parameters) extends LazyModu
     val gpio = IO(chiselTypeOf(lgpio.module.gpio_bundle))
     val ps2 = IO(chiselTypeOf(lkeyboard.module.ps2_bundle))
     val vga = IO(chiselTypeOf(lvga.module.vga_bundle))
+    val io_inst = IO(Output(UInt(32.W)))
+    val io_pc = IO(Output(UInt(64.W)))
+    val io_npc = IO(Output(UInt(64.W)))
+    io_inst := cpu.module.io_inst 
+    io_pc := cpu.module.io_pc 
+    io_npc := cpu.module.io_npc
     uart <> luart.module.uart
     spi <> lspi.module.spi_bundle
     psram <> lpsram.module.qspi_bundle
@@ -124,7 +130,12 @@ class ysyxSoCFull(implicit p: Parameters) extends LazyModule {
     }
 
     masic.intr_from_chipSlave := false.B
-
+    val io_inst = IO(Output(UInt(32.W)))
+    io_inst := masic.io_inst
+    val io_pc = IO(Output(UInt(64.W)))
+    io_pc := masic.io_pc 
+    val io_npc = IO(Output(UInt(64.W)))
+    io_npc := masic.io_pc
     val flash = Module(new flash)
     flash.io <> masic.spi
     flash.io.ss := masic.spi.ss(0)
