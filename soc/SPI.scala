@@ -50,21 +50,21 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
     mspi.io.reset := reset
     spi_bundle <> mspi.io.spi
 
-    val s_init_div :: s_init_ss :: s_init_ctr :: s_send_dat :: s_set_go :: s_wait_read :: s_read :: s_rec_ss :: Nil = Enum(8)
+    val s_idle :: s_init_div :: s_init_ss :: s_init_ctr :: s_send_dat :: s_set_go :: s_wait_read :: s_read :: s_rec_ss :: s_finished :: Nil = Enum(10)
     // 对 spi 进行初始化操作，要依次写入除数，片选，控制信号，随后写入数据，再读出数据，恢复片选
-    val state = RegInit(s_init_div)
+    val state = RegInit(s_idle)
     
     val r_paddr           = WireInit(0.U(32.W))
     val r_psel            = RegInit(0.B)
     val r_penable         = RegInit(0.B)
     val r_pprot           = RegInit(1.U(3.W))
-    val r_pwrite          = RegInit(0.B)
+    val r_pwrite          = WireInit(0.B)
     val r_pwdata          = WireInit(0.U(32.W))
     val r_pstrb           = RegInit(15.U(4.W))
     val r_pready          = WireInit(0.B)
     val r_prdata          = RegInit(0.U(32.W))
     val r_pslverr         = RegInit(0.B)
-    val r_o_pready        = RegInit(0.B)
+    val r_o_pready        = WireInit(0.B)
     val r_o_prdata        = RegInit(0.U(32.W))
     val r_o_pslverr       = RegInit(0.B)
 
@@ -85,8 +85,14 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
 
     when (in.paddr >= "x30000000".U && in.paddr <= "x3fffffff".U) {
       switch(state) {
+        is(s_idle) {
+          r_o_pready := 0.U
+          when (in.psel & in.penable) {
+            state := s_init_div
+          }
+        }
         is(s_init_div) {
-          r_o_pready     := 0.B
+          // r_o_pready     := 0.B
           r_paddr        := "x10001014".U 
           r_pwdata       := 0.U  // 除数设为 0
           r_pwrite       := 1.B
@@ -105,6 +111,7 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
           r_paddr        := "x10001018".U 
           r_pwdata       := 1.U   //片选选1 flash
           r_pstrb        := 1.U
+          r_pwrite       := 1.B
           r_psel := 1.B
           when (r_pready) {
             r_penable := 0.B 
@@ -117,6 +124,7 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
         is(s_init_ctr) {
           r_paddr         := "x10001010".U
           r_pwdata       := "b1100001000000".U
+          r_pwrite       := 1.B
           r_pstrb        := 3.U
           r_psel := 1.B
           when (r_pready) {
@@ -130,7 +138,10 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
         is(s_send_dat) {
           r_paddr         := "x10001000".U
           r_pwdata       := "b11000000".U + (Reverse(in.paddr(23, 0)) << 8.U)
-          r_psel := 1.B
+          // printf("spi xip in paddr=%x revpaddr=%x\n", in.paddr(23, 0), Reverse(in.paddr(23, 0)))
+          r_psel    := 1.B
+          r_pwrite := 1.B
+          r_pstrb := 15.U
           when (r_pready) {
             r_penable := 0.B
             r_psel := 0.B
@@ -144,6 +155,7 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
           r_pwdata       := "b1100101000000".U
           r_pstrb        := 2.U
           r_psel := 1.B
+          r_pwrite := 1.B
           when (r_pready) {
             r_penable := 0.B
             r_psel := 0.B
@@ -182,14 +194,26 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
           r_psel := 1.B
           r_paddr         := "x10001018".U
           r_pwrite       := 1.B
+          r_pwdata       := 0.U
           r_pstrb        := 1.B
+          
           when (r_pready) {
             r_penable := 0.B
+            
             r_psel := 0.B
-            state := s_init_div
-            r_o_pready := 1.B   // 输出
+            state := s_finished
+            
           }.otherwise{
             r_penable := RegNext(r_psel)
+          }
+        }
+        is(s_finished){
+          r_psel := 0.B 
+          r_paddr := 0.U
+          r_pwrite := 0.B
+          r_o_pready := 1.B   // 输出
+          when (!in.psel && !in.penable) {
+            state := s_idle
           }
         }
       }

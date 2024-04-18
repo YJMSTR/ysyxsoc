@@ -2812,227 +2812,200 @@ module APBSPI(
   wire [29:0] nodeIn_paddr = auto_in_paddr;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
   wire [31:0] nodeIn_pwdata = auto_in_pwdata;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
   wire [3:0]  nodeIn_pstrb = auto_in_pstrb;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
-  reg  [31:0] casez_tmp;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :91:26]
-  reg  [31:0] casez_tmp_0;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :90:26]
-  reg  [3:0]  casez_tmp_1;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :95:26]
-  reg         casez_tmp_2;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :96:27]
-  reg  [2:0]  casez_tmp_3;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :96:27]
-  reg         casez_tmp_4;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :96:27]
   wire [2:0]  nodeIn_pprot = 3'h1;	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17]
-  reg  [2:0]  state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
+  reg  [3:0]  state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
   reg         r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36]
   reg         r_penable;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36]
   reg  [2:0]  r_pprot;	// @[src/main/scala/ysyxSoC/SPI.scala:60:36]
-  reg         r_pwrite;	// @[src/main/scala/ysyxSoC/SPI.scala:61:36]
   reg  [3:0]  r_pstrb;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36]
   reg  [31:0] r_prdata;	// @[src/main/scala/ysyxSoC/SPI.scala:65:36]
   reg         r_pslverr;	// @[src/main/scala/ysyxSoC/SPI.scala:66:36]
-  reg         r_o_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:67:36]
   reg  [31:0] r_o_prdata;	// @[src/main/scala/ysyxSoC/SPI.scala:68:36]
   wire        _GEN = nodeIn_paddr > 30'h2FFFFFFF;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:86:20]
-  reg         r_penable_REG;	// @[src/main/scala/ysyxSoC/SPI.scala:101:33]
-  reg         r_penable_REG_1;	// @[src/main/scala/ysyxSoC/SPI.scala:114:33]
-  reg         r_penable_REG_2;	// @[src/main/scala/ysyxSoC/SPI.scala:127:33]
-  reg         r_penable_REG_3;	// @[src/main/scala/ysyxSoC/SPI.scala:139:33]
-  always_comb begin	// @[src/main/scala/ysyxSoC/SPI.scala:62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-    casez (state)	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      3'b000:
-        casez_tmp = 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      3'b001:
-        casez_tmp = 32'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      3'b010:
-        casez_tmp = 32'h1840;	// @[src/main/scala/ysyxSoC/SPI.scala:62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      3'b011:
-        casez_tmp =
-          {nodeIn_paddr[0],
-           nodeIn_paddr[1],
-           nodeIn_paddr[2],
-           nodeIn_paddr[3],
-           nodeIn_paddr[4],
-           {{nodeIn_paddr[5:4], nodeIn_paddr[7]} & 3'h5, 1'h0}
-             | {nodeIn_paddr[7:6], nodeIn_paddr[9:8]} & 4'h5,
-           nodeIn_paddr[9],
-           nodeIn_paddr[10],
-           nodeIn_paddr[11],
-           nodeIn_paddr[12],
-           nodeIn_paddr[13],
-           nodeIn_paddr[14],
-           nodeIn_paddr[15],
-           nodeIn_paddr[16],
-           nodeIn_paddr[17],
-           nodeIn_paddr[18],
-           nodeIn_paddr[19],
-           nodeIn_paddr[20],
-           nodeIn_paddr[21],
-           nodeIn_paddr[22],
-           nodeIn_paddr[23],
-           8'h0} + 32'hC0;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:58:36, :62:37, :87:21, :91:26, :106:26, :119:26, :132:{26,43,53,62,71}, :144:26, :150:19]
-      3'b100:
-        casez_tmp = 32'h1940;	// @[src/main/scala/ysyxSoC/SPI.scala:62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      3'b101:
-        casez_tmp = 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      3'b110:
-        casez_tmp = 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-      default:
-        casez_tmp = 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-    endcase	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :62:37, :87:21, :91:26, :106:26, :119:26, :132:26, :144:26]
-  end // always_comb
-  wire [31:0] r_pwdata = _GEN ? casez_tmp : 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :62:37, :86:{20,67}, :87:21, :91:26]
-  reg         r_penable_REG_4;	// @[src/main/scala/ysyxSoC/SPI.scala:152:33]
-  wire        _GEN_0 = state == 3'h5;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :150:19]
+  wire        _GEN_0 = state == 4'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21]
+  wire        _GEN_1 = state == 4'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :91:19]
+  reg         r_penable_REG;	// @[src/main/scala/ysyxSoC/SPI.scala:107:33]
+  wire        _GEN_2 = state == 4'h2;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :105:19]
+  reg         r_penable_REG_1;	// @[src/main/scala/ysyxSoC/SPI.scala:121:33]
+  wire        _GEN_3 = state == 4'h3;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :119:19]
+  reg         r_penable_REG_2;	// @[src/main/scala/ysyxSoC/SPI.scala:135:33]
+  wire        _GEN_4 = state == 4'h4;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :133:19]
+  reg         r_penable_REG_3;	// @[src/main/scala/ysyxSoC/SPI.scala:150:33]
+  wire        _GEN_5 = state == 4'h5;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :148:19]
+  reg         r_penable_REG_4;	// @[src/main/scala/ysyxSoC/SPI.scala:164:33]
+  wire        _GEN_6 = state == 4'h6;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :162:19]
+  reg         r_penable_REG_5;	// @[src/main/scala/ysyxSoC/SPI.scala:176:33]
+  wire        _GEN_7 = state == 4'h7;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :174:19]
+  wire        _GEN_8 = _GEN_5 | _GEN_6;	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :87:21]
+  reg         r_penable_REG_6;	// @[src/main/scala/ysyxSoC/SPI.scala:190:33]
+  wire        _GEN_9 = state == 4'h8;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :140:71]
+  wire [31:0] r_pwdata =
+    ~_GEN | _GEN_0 | _GEN_1
+      ? 32'h0
+      : _GEN_2
+          ? 32'h1
+          : _GEN_3
+              ? 32'h1840
+              : _GEN_4
+                  ? {nodeIn_paddr[0],
+                     nodeIn_paddr[1],
+                     nodeIn_paddr[2],
+                     nodeIn_paddr[3],
+                     nodeIn_paddr[4],
+                     {{nodeIn_paddr[5:4], nodeIn_paddr[7]} & 3'h5, 1'h0}
+                       | {nodeIn_paddr[7:6], nodeIn_paddr[9:8]} & 4'h5,
+                     nodeIn_paddr[9],
+                     nodeIn_paddr[10],
+                     nodeIn_paddr[11],
+                     nodeIn_paddr[12],
+                     nodeIn_paddr[13],
+                     nodeIn_paddr[14],
+                     nodeIn_paddr[15],
+                     nodeIn_paddr[16],
+                     nodeIn_paddr[17],
+                     nodeIn_paddr[18],
+                     nodeIn_paddr[19],
+                     nodeIn_paddr[20],
+                     nodeIn_paddr[21],
+                     nodeIn_paddr[22],
+                     nodeIn_paddr[23],
+                     8'h0} + 32'hC0
+                  : _GEN_5 ? 32'h1940 : 32'h0;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:57:37, :58:36, :60:36, :62:37, :86:{20,67}, :87:21, :112:26, :126:26, :140:{26,43,53,62,71}, :148:19, :155:26]
+  wire        _GEN_10 = _GEN_6 | _GEN_7;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21]
+  wire        _GEN_11 = ~_GEN | _GEN_0;	// @[src/main/scala/ysyxSoC/SPI.scala:60:36, :63:36, :86:{20,67}, :87:21]
+  reg         r_penable_REG_7;	// @[src/main/scala/ysyxSoC/SPI.scala:207:33]
+  wire        _GEN_12 = state == 4'h9;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :204:19]
+  wire [31:0] r_paddr =
+    _GEN_11
+      ? 32'h0
+      : _GEN_1
+          ? 32'h10001014
+          : _GEN_2
+              ? 32'h10001018
+              : _GEN_3
+                  ? 32'h10001010
+                  : _GEN_4
+                      ? 32'h10001000
+                      : _GEN_8
+                          ? 32'h10001011
+                          : _GEN_7 ? 32'h10001004 : _GEN_9 ? 32'h10001018 : 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :63:36, :68:36, :86:67, :87:21, :96:26, :111:26, :125:27, :139:27, :154:27, :168:27, :180:27, :195:27]
+  wire        r_pwrite =
+    _GEN & ~_GEN_0 & (_GEN_1 | _GEN_2 | _GEN_3 | _GEN_4 | _GEN_5 | ~_GEN_10 & _GEN_9);	// @[src/main/scala/ysyxSoC/SPI.scala:61:37, :63:36, :86:{20,67}, :87:21, :98:26, :114:26, :127:26, :143:20, :158:20, :169:26, :181:26]
+  wire        r_o_pready =
+    _GEN
+    & ~(_GEN_0 | _GEN_1 | _GEN_2 | _GEN_3 | _GEN_4 | _GEN_5 | _GEN_6 | _GEN_7 | _GEN_9)
+    & _GEN_12;	// @[src/main/scala/ysyxSoC/SPI.scala:67:37, :86:{20,67}, :87:21, :89:22]
+  wire        _GEN_13 = nodeIn_paddr > 30'h10000FFF & nodeIn_paddr < 30'h10002000;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:220:{25,42,54}]
+  wire        _GEN_14 = _GEN | ~_GEN_13;	// @[src/main/scala/ysyxSoC/SPI.scala:82:27, :86:{20,67}, :220:{42,71}]
+  wire [31:0] nodeIn_prdata = _GEN_14 ? r_o_prdata : _mspi_in_prdata;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:48:22, :68:36, :82:27, :86:67, :220:71]
+  wire        nodeIn_pready = _GEN_14 ? r_o_pready : _mspi_in_pready;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:48:22, :67:37, :81:27, :82:27, :86:67, :220:71]
+  wire        nodeIn_pslverr = ~_GEN & (~_GEN_13 | _mspi_in_pslverr);	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:48:22, :60:36, :82:27, :83:27, :86:{20,67}, :87:21, :220:{42,71}, :221:18, :223:18]
   wire        r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
-  wire        _GEN_1 = r_pready & ~(_mspi_in_prdata[8]);	// @[src/main/scala/ysyxSoC/SPI.scala:48:22, :64:37, :159:{26,29,49}]
-  reg         r_penable_REG_5;	// @[src/main/scala/ysyxSoC/SPI.scala:164:33]
-  wire        _GEN_2 = state == 3'h6;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :162:19]
-  reg         r_penable_REG_6;	// @[src/main/scala/ysyxSoC/SPI.scala:178:33]
-  always_comb begin	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-    casez (state)	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b000:
-        casez_tmp_0 = 32'h10001014;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b001:
-        casez_tmp_0 = 32'h10001018;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b010:
-        casez_tmp_0 = 32'h10001010;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b011:
-        casez_tmp_0 = 32'h10001000;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b100:
-        casez_tmp_0 = 32'h10001011;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b101:
-        casez_tmp_0 = 32'h10001011;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      3'b110:
-        casez_tmp_0 = 32'h10001004;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-      default:
-        casez_tmp_0 = 32'h10001018;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-    endcase	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :57:37, :68:36, :87:21, :90:26, :105:26, :118:27, :131:27, :143:27, :156:27, :168:27, :183:27]
-  end // always_comb
-  wire [31:0] r_paddr = _GEN ? casez_tmp_0 : 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :86:{20,67}, :87:21, :90:26]
-  wire        _GEN_3 = _GEN_0 | _GEN_2;	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :157:26, :169:26]
-  always_comb begin	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-    casez (state)	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b000:
-        casez_tmp_1 = 4'hF;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b001:
-        casez_tmp_1 = 4'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b010:
-        casez_tmp_1 = 4'h3;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b011:
-        casez_tmp_1 = r_pstrb;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b100:
-        casez_tmp_1 = 4'h2;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b101:
-        casez_tmp_1 = r_pstrb;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      3'b110:
-        casez_tmp_1 = r_pstrb;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-      default:
-        casez_tmp_1 = _GEN_3 | ~(&state) ? r_pstrb : 4'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :63:36, :87:21, :95:26, :107:26, :120:26, :145:26, :157:26, :169:26]
-    endcase	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :63:36, :87:21, :95:26, :107:26, :120:26, :145:26]
-  end // always_comb
-  always_comb begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :96:27, :109:27, :159:68, :171:27]
-    casez (state)	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27, :109:27, :159:68, :171:27]
-      3'b000:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-      3'b001:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-      3'b010:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-      3'b011:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-      3'b100:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-      3'b101:
-        casez_tmp_2 = ~_GEN_1;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :87:21, :92:26, :96:27, :109:27, :158:26, :159:{26,68}, :161:20, :171:27]
-      3'b110:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-      default:
-        casez_tmp_2 = ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :87:21, :92:26, :93:26, :96:27, :98:20, :109:27, :159:68, :171:27]
-    endcase	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27, :109:27, :159:68, :171:27]
-  end // always_comb
-  wire        _GEN_4 = (&state) & r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :186:27, :189:19]
-  always_comb begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27]
-    casez (state)	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27]
-      3'b000:
-        casez_tmp_3 = r_pready ? 3'h1 : state;	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :96:27, :99:19, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27]
-      3'b001:
-        casez_tmp_3 = r_pready ? 3'h2 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :96:27, :109:27, :112:19, :122:27, :134:27, :147:27, :159:68, :171:27]
-      3'b010:
-        casez_tmp_3 = r_pready ? 3'h3 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :96:27, :109:27, :122:27, :125:19, :134:27, :147:27, :159:68, :171:27]
-      3'b011:
-        casez_tmp_3 = r_pready ? 3'h4 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :96:27, :109:27, :122:27, :134:27, :137:19, :147:27, :159:68, :171:27]
-      3'b100:
-        casez_tmp_3 = r_pready ? 3'h5 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :150:19, :159:68, :171:27]
-      3'b101:
-        casez_tmp_3 = _GEN_1 ? 3'h6 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:{26,68}, :162:19, :171:27]
-      3'b110:
-        casez_tmp_3 = r_pready ? 3'h7 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :64:37, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :176:19]
-      default:
-        casez_tmp_3 = _GEN_4 ? 3'h0 : state;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27, :189:19]
-    endcase	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27]
-  end // always_comb
-  reg         r_penable_REG_7;	// @[src/main/scala/ysyxSoC/SPI.scala:192:33]
-  always_comb begin	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27]
-    casez (state)	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :59:36, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27]
-      3'b000:
-        casez_tmp_4 = ~r_pready & r_penable_REG;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:{23,33}, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27]
-      3'b001:
-        casez_tmp_4 = ~r_pready & r_penable_REG_1;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:23, :109:27, :110:23, :114:{23,33}, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27]
-      3'b010:
-        casez_tmp_4 = ~r_pready & r_penable_REG_2;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:23, :109:27, :122:27, :123:23, :127:{23,33}, :134:27, :147:27, :159:68, :171:27, :186:27]
-      3'b011:
-        casez_tmp_4 = ~r_pready & r_penable_REG_3;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:23, :109:27, :122:27, :134:27, :135:23, :139:{23,33}, :147:27, :159:68, :171:27, :186:27]
-      3'b100:
-        casez_tmp_4 = ~r_pready & r_penable_REG_4;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:23, :109:27, :122:27, :134:27, :147:27, :148:23, :152:{23,33}, :159:68, :171:27, :186:27]
-      3'b101:
-        casez_tmp_4 = ~_GEN_1 & r_penable_REG_5;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:{26,68}, :160:23, :164:{23,33}, :171:27, :186:27]
-      3'b110:
-        casez_tmp_4 = ~r_pready & r_penable_REG_6;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:23, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :172:26, :178:{23,33}, :186:27]
-      default:
-        casez_tmp_4 = ~r_pready & r_penable_REG_7;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :87:21, :96:27, :97:23, :101:23, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27, :187:23, :192:{23,33}]
-    endcase	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :59:36, :87:21, :96:27, :109:27, :122:27, :134:27, :147:27, :159:68, :171:27, :186:27]
-  end // always_comb
-  wire        _GEN_5 = nodeIn_paddr > 30'h10000FFF & nodeIn_paddr < 30'h10002000;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:196:{25,42,54}]
-  wire        _GEN_6 = _GEN | ~_GEN_5;	// @[src/main/scala/ysyxSoC/SPI.scala:82:27, :86:{20,67}, :196:{42,71}]
-  wire [31:0] nodeIn_prdata = _GEN_6 ? r_o_prdata : _mspi_in_prdata;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:48:22, :68:36, :82:27, :86:67, :196:71]
-  wire        nodeIn_pready = _GEN_6 ? r_o_pready : _mspi_in_pready;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:48:22, :67:36, :81:27, :82:27, :86:67, :196:71]
-  wire        nodeIn_pslverr = ~_GEN & (~_GEN_5 | _mspi_in_pslverr);	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:48:22, :68:36, :82:27, :83:27, :86:{20,67}, :87:21, :196:{42,71}, :197:18, :199:18]
-  wire        _GEN_7 = state == 3'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21]
-  wire        _GEN_8 = state == 3'h1;	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21]
-  wire        _GEN_9 = state == 3'h2;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :112:19]
-  wire        _GEN_10 = state == 3'h3;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :125:19]
-  wire        _GEN_11 = state == 3'h4;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :137:19]
+  wire        _GEN_15 = r_pready & ~(_mspi_in_prdata[8]);	// @[src/main/scala/ysyxSoC/SPI.scala:48:22, :64:37, :171:{26,29,49}]
   always @(posedge clock) begin
     if (reset) begin
-      state <= 3'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
+      state <= 4'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
       r_psel <= 1'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36]
       r_penable <= 1'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :59:36]
       r_pprot <= 3'h1;	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:60:36]
-      r_pwrite <= 1'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :61:36]
       r_pstrb <= 4'hF;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36]
       r_prdata <= 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :65:36]
       r_pslverr <= 1'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :66:36]
-      r_o_pready <= 1'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :67:36]
       r_o_prdata <= 32'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:57:37, :68:36]
     end
     else begin
       if (_GEN) begin	// @[src/main/scala/ysyxSoC/SPI.scala:86:20]
-        state <= casez_tmp_3;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :96:27]
-        r_psel <= casez_tmp_2;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :87:21, :96:27]
-        r_penable <= casez_tmp_4;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :87:21, :96:27]
-        r_pwrite <=
-          _GEN_7
-          | (_GEN_8 | _GEN_9 | _GEN_10 | _GEN_11
-               ? r_pwrite
-               : ~_GEN_3 & ((&state) | r_pwrite));	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :61:36, :87:21, :92:26, :157:26, :169:26, :184:26]
-        r_pstrb <= casez_tmp_1;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21, :95:26]
-        r_o_pready <=
-          ~_GEN_7
-          & (~(_GEN_8 | _GEN_9 | _GEN_10 | _GEN_11 | _GEN_3) & _GEN_4 | r_o_pready);	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :67:36, :87:21, :89:26, :157:26, :169:26, :186:27, :189:19]
+        if (_GEN_0) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (nodeIn_psel & nodeIn_penable)	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:90:25]
+            state <= 4'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :91:19]
+        end
+        else if (_GEN_1) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h2;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :105:19]
+        end
+        else if (_GEN_2) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h3;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :119:19]
+        end
+        else if (_GEN_3) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h4;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :133:19]
+        end
+        else if (_GEN_4) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h5;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :148:19]
+        end
+        else if (_GEN_5) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h6;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :162:19]
+        end
+        else if (_GEN_6) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (_GEN_15)	// @[src/main/scala/ysyxSoC/SPI.scala:171:26]
+            state <= 4'h7;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :174:19]
+        end
+        else if (_GEN_7) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h8;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :140:71]
+        end
+        else if (_GEN_9) begin	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          if (r_pready)	// @[src/main/scala/ysyxSoC/SPI.scala:64:37]
+            state <= 4'h9;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :204:19]
+        end
+        else if (_GEN_12 & ~nodeIn_psel & ~nodeIn_penable)	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:55:24, :87:21, :215:{17,29,42}, :216:19]
+          state <= 4'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
       end
-      if (_GEN & _GEN_7)	// @[src/main/scala/ysyxSoC/SPI.scala:60:36, :86:{20,67}, :87:21, :94:26]
-        r_pprot <= 3'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :60:36]
+      if (_GEN_11) begin	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :63:36, :86:67, :87:21]
+      end
+      else begin	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :86:67, :87:21]
+        if (_GEN_1 | _GEN_2 | _GEN_3 | _GEN_4 | _GEN_5)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :102:27]
+          r_psel <= ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :98:26, :99:26, :102:27, :104:20]
+        else if (_GEN_6)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_psel <= ~_GEN_15;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :98:26, :170:26, :171:{26,68}, :173:20]
+        else if (_GEN_7 | _GEN_9)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :183:27]
+          r_psel <= ~r_pready;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :64:37, :98:26, :99:26, :102:27, :104:20]
+        else	// @[src/main/scala/ysyxSoC/SPI.scala:87:21, :183:27]
+          r_psel <= ~_GEN_12 & r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :87:21, :211:18]
+        if (_GEN_1)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:{23,33}]
+        else if (_GEN_2)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG_1;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:23, :116:27, :117:23, :121:{23,33}]
+        else if (_GEN_3)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG_2;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:23, :130:27, :131:23, :135:{23,33}]
+        else if (_GEN_4)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG_3;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:23, :145:27, :146:23, :150:{23,33}]
+        else if (_GEN_5)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG_4;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:23, :159:27, :160:23, :164:{23,33}]
+        else if (_GEN_6)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~_GEN_15 & r_penable_REG_5;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :171:{26,68}, :172:23, :176:{23,33}]
+        else if (_GEN_7)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG_6;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:23, :183:27, :184:26, :190:{23,33}]
+        else if (_GEN_9)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+          r_penable <= ~r_pready & r_penable_REG_7;	// @[src/main/scala/ysyxSoC/SPI.scala:59:36, :64:37, :102:27, :103:23, :107:23, :200:27, :201:23, :207:{23,33}]
+      end
+      if (~_GEN | _GEN_0 | ~_GEN_1) begin	// @[src/main/scala/ysyxSoC/SPI.scala:60:36, :86:{20,67}, :87:21]
+      end
+      else	// @[src/main/scala/ysyxSoC/SPI.scala:60:36, :86:67, :87:21]
+        r_pprot <= 3'h0;	// @[src/main/scala/ysyxSoC/SPI.scala:60:36, :100:26]
+      if (_GEN_11) begin	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :86:67, :87:21]
+      end
+      else if (_GEN_1)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+        r_pstrb <= 4'hF;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36]
+      else if (_GEN_2)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+        r_pstrb <= 4'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :91:19]
+      else if (_GEN_3)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+        r_pstrb <= 4'h3;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :119:19]
+      else if (_GEN_4)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+        r_pstrb <= 4'hF;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36]
+      else if (_GEN_5)	// @[src/main/scala/ysyxSoC/SPI.scala:87:21]
+        r_pstrb <= 4'h2;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :105:19]
+      else if (_GEN_10 | ~_GEN_9) begin	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21]
+      end
+      else	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :87:21]
+        r_pstrb <= 4'h1;	// @[src/main/scala/ysyxSoC/SPI.scala:63:36, :91:19]
       r_prdata <= _mspi_in_prdata;	// @[src/main/scala/ysyxSoC/SPI.scala:48:22, :65:36]
       r_pslverr <= _mspi_in_pslverr;	// @[src/main/scala/ysyxSoC/SPI.scala:48:22, :66:36]
-      if (~_GEN | _GEN_7 | _GEN_8 | _GEN_9 | _GEN_10 | _GEN_11 | _GEN_0
-          | ~(_GEN_2 & r_pready)) begin	// @[src/main/scala/ysyxSoC/SPI.scala:64:37, :68:36, :86:{20,67}, :87:21, :171:27, :175:24]
+      if (~_GEN | _GEN_0 | _GEN_1 | _GEN_2 | _GEN_3 | _GEN_4 | _GEN_8
+          | ~(_GEN_7 & r_pready)) begin	// @[src/main/scala/ysyxSoC/SPI.scala:60:36, :64:37, :68:36, :86:{20,67}, :87:21, :183:27, :187:24]
       end
       else	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :86:67, :87:21]
         r_o_prdata <=
@@ -3075,16 +3048,16 @@ module APBSPI(
                        r_prdata[4],
                        r_prdata[5],
                        r_prdata[6],
-                       r_prdata[7]}}};	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :65:36, :68:36, :132:{53,71}, :175:{34,43,51,61,70,79,87,97,106,116,125,135,144,154}]
+                       r_prdata[7]}}};	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :65:36, :68:36, :140:{53,71}, :187:{34,43,51,61,70,79,87,97,106,116,125,135,144,154}]
     end
-    r_penable_REG <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :101:33]
-    r_penable_REG_1 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :114:33]
-    r_penable_REG_2 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :127:33]
-    r_penable_REG_3 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :139:33]
-    r_penable_REG_4 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :152:33]
-    r_penable_REG_5 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :164:33]
-    r_penable_REG_6 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :178:33]
-    r_penable_REG_7 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :192:33]
+    r_penable_REG <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :107:33]
+    r_penable_REG_1 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :121:33]
+    r_penable_REG_2 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :135:33]
+    r_penable_REG_3 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :150:33]
+    r_penable_REG_4 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :164:33]
+    r_penable_REG_5 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :176:33]
+    r_penable_REG_6 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :190:33]
+    r_penable_REG_7 <= r_psel;	// @[src/main/scala/ysyxSoC/SPI.scala:58:36, :207:33]
   end // always @(posedge)
   `ifdef ENABLE_INITIAL_REG_
     `ifdef FIRRTL_BEFORE_INITIAL
@@ -3099,24 +3072,22 @@ module APBSPI(
         for (logic [1:0] i = 2'h0; i < 2'h3; i += 2'h1) begin
           _RANDOM[i] = `RANDOM;
         end
-        state = _RANDOM[2'h0][2:0];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
-        r_psel = _RANDOM[2'h0][3];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :58:36]
-        r_penable = _RANDOM[2'h0][4];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :59:36]
-        r_pprot = _RANDOM[2'h0][7:5];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :60:36]
-        r_pwrite = _RANDOM[2'h0][8];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :61:36]
+        state = _RANDOM[2'h0][3:0];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24]
+        r_psel = _RANDOM[2'h0][4];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :58:36]
+        r_penable = _RANDOM[2'h0][5];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :59:36]
+        r_pprot = _RANDOM[2'h0][8:6];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :60:36]
         r_pstrb = _RANDOM[2'h0][12:9];	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :63:36]
         r_prdata = {_RANDOM[2'h0][31:13], _RANDOM[2'h1][12:0]};	// @[src/main/scala/ysyxSoC/SPI.scala:55:24, :65:36]
         r_pslverr = _RANDOM[2'h1][13];	// @[src/main/scala/ysyxSoC/SPI.scala:65:36, :66:36]
-        r_o_pready = _RANDOM[2'h1][14];	// @[src/main/scala/ysyxSoC/SPI.scala:65:36, :67:36]
-        r_o_prdata = {_RANDOM[2'h1][31:15], _RANDOM[2'h2][14:0]};	// @[src/main/scala/ysyxSoC/SPI.scala:65:36, :68:36]
-        r_penable_REG = _RANDOM[2'h2][16];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :101:33]
-        r_penable_REG_1 = _RANDOM[2'h2][17];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :114:33]
-        r_penable_REG_2 = _RANDOM[2'h2][18];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :127:33]
-        r_penable_REG_3 = _RANDOM[2'h2][19];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :139:33]
-        r_penable_REG_4 = _RANDOM[2'h2][20];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :152:33]
-        r_penable_REG_5 = _RANDOM[2'h2][21];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :164:33]
-        r_penable_REG_6 = _RANDOM[2'h2][22];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :178:33]
-        r_penable_REG_7 = _RANDOM[2'h2][23];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :192:33]
+        r_o_prdata = {_RANDOM[2'h1][31:14], _RANDOM[2'h2][13:0]};	// @[src/main/scala/ysyxSoC/SPI.scala:65:36, :68:36]
+        r_penable_REG = _RANDOM[2'h2][15];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :107:33]
+        r_penable_REG_1 = _RANDOM[2'h2][16];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :121:33]
+        r_penable_REG_2 = _RANDOM[2'h2][17];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :135:33]
+        r_penable_REG_3 = _RANDOM[2'h2][18];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :150:33]
+        r_penable_REG_4 = _RANDOM[2'h2][19];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :164:33]
+        r_penable_REG_5 = _RANDOM[2'h2][20];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :176:33]
+        r_penable_REG_6 = _RANDOM[2'h2][21];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :190:33]
+        r_penable_REG_7 = _RANDOM[2'h2][22];	// @[src/main/scala/ysyxSoC/SPI.scala:68:36, :207:33]
       `endif // RANDOMIZE_REG_INIT
     end // initial
     `ifdef FIRRTL_AFTER_INITIAL
@@ -3126,13 +3097,13 @@ module APBSPI(
   spi_top_apb mspi (	// @[src/main/scala/ysyxSoC/SPI.scala:48:22]
     .clock       (clock),
     .reset       (reset),
-    .in_psel     (_GEN_6 ? r_psel : nodeIn_psel),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:58:36, :72:27, :82:27, :86:67, :196:71]
-    .in_penable  (_GEN_6 ? r_penable : nodeIn_penable),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:59:36, :73:27, :82:27, :86:67, :196:71]
-    .in_pwrite   (_GEN_6 ? r_pwrite : nodeIn_pwrite),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:61:36, :75:27, :82:27, :86:67, :196:71]
-    .in_paddr    (_GEN_6 ? r_paddr : {2'h0, nodeIn_paddr}),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:57:37, :71:27, :82:27, :86:67, :196:71, :197:18]
-    .in_pprot    (_GEN_6 ? r_pprot : 3'h1),	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:60:36, :74:27, :82:27, :86:67, :196:71]
-    .in_pwdata   (_GEN_6 ? r_pwdata : nodeIn_pwdata),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:62:37, :76:27, :82:27, :86:67, :196:71]
-    .in_pstrb    (_GEN_6 ? r_pstrb : nodeIn_pstrb),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:63:36, :77:27, :82:27, :86:67, :196:71]
+    .in_psel     (_GEN_14 ? r_psel : nodeIn_psel),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:58:36, :72:27, :82:27, :86:67, :220:71]
+    .in_penable  (_GEN_14 ? r_penable : nodeIn_penable),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:59:36, :73:27, :82:27, :86:67, :220:71]
+    .in_pwrite   (_GEN_14 ? r_pwrite : nodeIn_pwrite),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:61:37, :75:27, :82:27, :86:67, :220:71]
+    .in_paddr    (_GEN_14 ? r_paddr : {2'h0, nodeIn_paddr}),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:57:37, :71:27, :82:27, :86:67, :220:71, :221:18]
+    .in_pprot    (_GEN_14 ? r_pprot : 3'h1),	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:60:36, :74:27, :82:27, :86:67, :220:71]
+    .in_pwdata   (_GEN_14 ? r_pwdata : nodeIn_pwdata),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:62:37, :76:27, :82:27, :86:67, :220:71]
+    .in_pstrb    (_GEN_14 ? r_pstrb : nodeIn_pstrb),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/SPI.scala:63:36, :77:27, :82:27, :86:67, :220:71]
     .spi_miso    (spi_bundle_miso),
     .in_pready   (_mspi_in_pready),
     .in_pslverr  (_mspi_in_pslverr),
