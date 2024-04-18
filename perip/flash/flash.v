@@ -20,6 +20,7 @@ module flash (
 
   wire ren = (state == addr_t) && (counter == 8'd23);
   wire [31:0] rdata;
+  // wire [63:0] rdata;
   wire [31:0] raddr = {8'b0, addr[22:0], mosi};
   flash_cmd flash_cmd_i(
     .clock(sck),
@@ -81,8 +82,8 @@ module flash (
 
 endmodule
 
+// import "DPI-C" function void flash_read(input int addr, output longint data);
 import "DPI-C" function void flash_read(input int addr, output int data);
-
 module flash_cmd(
   input             clock,
   input             valid,
@@ -92,8 +93,11 @@ module flash_cmd(
 );
   always@(posedge clock) begin
     if (valid)
-      if (cmd == 8'h03) flash_read(addr, data);
-      else begin
+      if (cmd == 8'h03) begin
+        $display("soc flash: dpic read addr=%x", addr);
+        flash_read(addr, data);
+        $display("soc flash: dpic read data=%x", data);
+      end else begin
         $fwrite(32'h80000002, "Assertion failed: Unsupport command `%xh`, only support `03h` read command\n", cmd);
         $fatal;
       end

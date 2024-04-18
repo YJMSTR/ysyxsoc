@@ -60,9 +60,9 @@ class AXI4ToAPB(val aFlow: Boolean = true)(implicit p: Parameters) extends LazyM
       // burst is not supported
       assert(!(ar.valid && ar.bits.len =/= 0.U))
       assert(!(aw.valid && aw.bits.len =/= 0.U))
-      // size > 4 is not supported
-      assert(!(ar.valid && ar.bits.size > "b10".U))
-      assert(!(aw.valid && aw.bits.size > "b10".U))
+      // // size > 4 is not supported
+      // assert(!(ar.valid && ar.bits.size > "b10".U))
+      // assert(!(aw.valid && aw.bits.size > "b10".U))
 
       val rid_reg    = RegEnable(ar.bits.id, accept_read)
       val bid_reg    = RegEnable(aw.bits.id, accept_write)
