@@ -16,6 +16,15 @@
   `define RANDOM $random
 `endif // not def RANDOM
 
+// Users can define 'PRINTF_COND' to add an extra gate to prints.
+`ifndef PRINTF_COND_
+  `ifdef PRINTF_COND
+    `define PRINTF_COND_ (`PRINTF_COND)
+  `else  // PRINTF_COND
+    `define PRINTF_COND_ 1
+  `endif // PRINTF_COND
+`endif // not def PRINTF_COND_
+
 // Users can define 'ASSERT_VERBOSE_COND' to add an extra gate to assert error printing.
 `ifndef ASSERT_VERBOSE_COND_
   `ifdef ASSERT_VERBOSE_COND
@@ -3130,12 +3139,12 @@ module APBPSRAM(
   input  [31:0] auto_in_paddr,	// @[src/main/scala/diplomacy/LazyModule.scala:367:18]
                 auto_in_pwdata,	// @[src/main/scala/diplomacy/LazyModule.scala:367:18]
   input  [3:0]  auto_in_pstrb,	// @[src/main/scala/diplomacy/LazyModule.scala:367:18]
-  inout  [3:0]  qspi_bundle_dio,	// @[src/main/scala/ysyxSoC/PSRAM.scala:50:25]
+  inout  [3:0]  qspi_bundle_dio,	// @[src/main/scala/ysyxSoC/PSRAM.scala:193:25]
   output        auto_in_pready,	// @[src/main/scala/diplomacy/LazyModule.scala:367:18]
                 auto_in_pslverr,	// @[src/main/scala/diplomacy/LazyModule.scala:367:18]
   output [31:0] auto_in_prdata,	// @[src/main/scala/diplomacy/LazyModule.scala:367:18]
-  output        qspi_bundle_sck,	// @[src/main/scala/ysyxSoC/PSRAM.scala:50:25]
-                qspi_bundle_ce_n	// @[src/main/scala/ysyxSoC/PSRAM.scala:50:25]
+  output        qspi_bundle_sck,	// @[src/main/scala/ysyxSoC/PSRAM.scala:193:25]
+                qspi_bundle_ce_n	// @[src/main/scala/ysyxSoC/PSRAM.scala:193:25]
 );
 
   wire [31:0] nodeIn_prdata;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
@@ -3147,15 +3156,15 @@ module APBPSRAM(
   wire [31:0] nodeIn_paddr = auto_in_paddr;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
   wire [31:0] nodeIn_pwdata = auto_in_pwdata;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
   wire [3:0]  nodeIn_pstrb = auto_in_pstrb;	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
-  wire [2:0]  nodeIn_pprot = 3'h1;	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/PSRAM.scala:52:24]
-  psram_top_apb mpsram (	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:24]
+  wire [2:0]  nodeIn_pprot = 3'h1;	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/PSRAM.scala:195:24]
+  psram_top_apb mpsram (	// @[src/main/scala/ysyxSoC/PSRAM.scala:195:24]
     .clock      (clock),
     .reset      (reset),
     .in_psel    (nodeIn_psel),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
     .in_penable (nodeIn_penable),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
     .in_pwrite  (nodeIn_pwrite),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
     .in_paddr   (nodeIn_paddr),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
-    .in_pprot   (3'h1),	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/PSRAM.scala:52:24]
+    .in_pprot   (3'h1),	// @[src/main/scala/diplomacy/LazyModule.scala:367:18, src/main/scala/diplomacy/Nodes.scala:1214:17, src/main/scala/ysyxSoC/PSRAM.scala:195:24]
     .in_pwdata  (nodeIn_pwdata),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
     .in_pstrb   (nodeIn_pstrb),	// @[src/main/scala/diplomacy/Nodes.scala:1214:17]
     .qspi_dio   (qspi_bundle_dio),
@@ -4611,7 +4620,189 @@ module bitrevChisel(
   assign io_miso = io_ss | (full_mosi ? cnt[3] | _io_miso_T[0] : ~_GEN | io_mosi);	// @[src/main/scala/ysyxSoC/BitRev.scala:15:22, :17:28, :46:18, :47:15, :48:24, :51:{19,28}, :55:19, :67:{18,25}, :69:{19,35}, :73:15]
 endmodule
 
-// external module psram
+// external module TriStateInBuf
+
+// external module psram_cmd
+
+module psramChisel(
+  input       io_sck,	// @[src/main/scala/ysyxSoC/PSRAM.scala:32:14]
+              io_ce_n,	// @[src/main/scala/ysyxSoC/PSRAM.scala:32:14]
+  inout [3:0] io_dio	// @[src/main/scala/ysyxSoC/PSRAM.scala:32:14]
+);
+
+  wire [31:0] _psram_cmd_io_odata;	// @[src/main/scala/ysyxSoC/PSRAM.scala:48:30]
+  wire [3:0]  _di_buf_din;	// @[src/main/scala/ysyxSoC/TriState.scala:32:21]
+  wire        ren;	// @[src/main/scala/ysyxSoC/PSRAM.scala:33:21]
+  wire        _GEN = ~io_sck;	// @[src/main/scala/ysyxSoC/PSRAM.scala:37:22]
+  reg  [7:0]  cmd_reg;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26]
+  reg  [23:0] addr_reg;	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27]
+  reg  [31:0] data_reg;	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27]
+  reg  [31:0] idata_reg;	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28]
+  wire [15:0] data_bswap_lo = {idata_reg[23:16], idata_reg[31:24]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :44:{25,70,89}]
+  wire [15:0] data_bswap_hi = {idata_reg[7:0], idata_reg[15:8]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :44:{25,35,52}]
+  wire [31:0] data_bswap = {data_bswap_hi, data_bswap_lo};	// @[src/main/scala/ysyxSoC/PSRAM.scala:44:25]
+  reg  [2:0]  state_t;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26]
+  reg  [7:0]  counter;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26]
+  wire        _psram_cmd_io_io_rvalid_T = state_t == 3'h2;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :52:40]
+  wire        _psram_cmd_io_io_rvalid_T_1 = counter == 8'h5;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :52:65]
+  wire        _psram_cmd_io_io_rvalid_T_3 = cmd_reg == 8'h6B;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :52:86]
+  wire        _psram_cmd_io_io_wvalid_T = state_t == 3'h4;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :53:40]
+  wire        _psram_cmd_io_io_wvalid_T_1 = counter == 8'h1C;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :53:66]
+  wire        _psram_cmd_io_io_wvalid_T_3 = cmd_reg == 8'h38;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :53:88]
+  wire [3:0]  dread = data_reg[31:28];	// @[src/main/scala/ysyxSoC/PSRAM.scala:34:19, :42:27, :58:22]
+  wire        _GEN_0 = state_t == 3'h1;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :60:21]
+  wire        _GEN_1 = counter == 8'h14;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :73:22]
+  wire [15:0] data_reg_lo = {_psram_cmd_io_odata[23:16], _psram_cmd_io_odata[31:24]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:48:30, :98:{26,107,138}]
+  wire [15:0] data_reg_hi = {_psram_cmd_io_odata[7:0], _psram_cmd_io_odata[15:8]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:48:30, :98:{26,48,77}]
+  wire        _GEN_2 = state_t == 3'h3;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :60:21, :96:19]
+  wire        _GEN_3 = _psram_cmd_io_io_rvalid_T | _GEN_2;	// @[src/main/scala/ysyxSoC/PSRAM.scala:33:21, :52:40, :60:21]
+  assign ren =
+    (|state_t)
+    & (_GEN_0
+         ? _GEN_1 & ~_psram_cmd_io_io_rvalid_T_3 & _psram_cmd_io_io_wvalid_T_3
+         : ~_GEN_3 & _psram_cmd_io_io_wvalid_T & ~_psram_cmd_io_io_wvalid_T_1);	// @[src/main/scala/ysyxSoC/PSRAM.scala:33:21, :46:26, :52:86, :53:{40,66,88}, :60:21, :67:30, :73:{22,32}, :76:38, :79:43, :118:13, :119:33, :122:15]
+  `ifndef SYNTHESIS	// @[src/main/scala/ysyxSoC/PSRAM.scala:136:15]
+    always @(posedge _GEN) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:37:22, :136:15]
+      if ((`PRINTF_COND_) & (|state_t) & ~_GEN_0 & ~_psram_cmd_io_io_rvalid_T & ~_GEN_2
+          & ~_psram_cmd_io_io_wvalid_T & state_t == 3'h6 & ~io_ce_n)	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :52:40, :53:40, :60:21, :85:21, :136:15]
+        $fwrite(32'h80000002, "psram err at psram.scala");	// @[src/main/scala/ysyxSoC/PSRAM.scala:136:15]
+    end // always @(posedge)
+  `endif // not def SYNTHESIS
+  wire        _GEN_4 = (_GEN_2 | _psram_cmd_io_io_wvalid_T) & _psram_cmd_io_io_wvalid_T_1;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :53:{40,66}, :60:21, :104:33, :106:19, :119:33, :121:19]
+  wire        _GEN_5 = counter == 8'h7;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :62:22]
+  always @(posedge _GEN) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:37:22]
+    if (io_ce_n) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:37:22]
+      cmd_reg <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26]
+      addr_reg <= 24'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27]
+      data_reg <= 32'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27]
+      idata_reg <= 32'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27, :43:28]
+      state_t <= 3'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26]
+      counter <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :47:26]
+    end
+    else begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:37:22]
+      if ((|state_t) | _GEN_5) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :46:26, :60:21, :62:{22,31}]
+      end
+      else	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :60:21, :62:31]
+        cmd_reg <= {cmd_reg[6:0], _di_buf_din[0]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :68:{25,33,43}, src/main/scala/ysyxSoC/TriState.scala:32:21]
+      if (|state_t) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :60:21]
+        if (_GEN_0) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:60:21]
+          if (_GEN_1) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:73:22]
+            if (_psram_cmd_io_io_rvalid_T_3)	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:86]
+              state_t <= 3'h2;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :52:40]
+            else	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:86]
+              state_t <= {1'h1, ~_psram_cmd_io_io_wvalid_T_3, 1'h0};	// @[src/main/scala/ysyxSoC/PSRAM.scala:33:21, :43:28, :46:26, :53:88, :67:30, :76:38, :79:43, :80:21, :85:21]
+            counter <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :47:26]
+          end
+          else begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:73:22]
+            addr_reg <= {addr_reg[19:0], _di_buf_din};	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27, :91:{26,35}, src/main/scala/ysyxSoC/TriState.scala:32:21]
+            counter <= counter + 8'h4;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :90:30]
+          end
+          if (~_GEN_1 | _psram_cmd_io_io_rvalid_T_3 | ~_psram_cmd_io_io_wvalid_T_3) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :52:86, :53:88, :73:{22,32}, :76:38, :79:43]
+          end
+          else	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :73:32, :76:38]
+            idata_reg <= {28'h0, _di_buf_din};	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :81:23, src/main/scala/ysyxSoC/TriState.scala:32:21]
+        end
+        else begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:60:21]
+          if (_psram_cmd_io_io_rvalid_T | ~_GEN_4) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27, :46:26, :52:40, :60:21, :104:33, :106:19, :119:33, :121:19]
+          end
+          else	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27, :60:21]
+            addr_reg <= 24'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27]
+          if (_GEN_3 | ~_psram_cmd_io_io_wvalid_T | _psram_cmd_io_io_wvalid_T_1) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:33:21, :43:28, :53:{40,66}, :60:21, :119:33]
+          end
+          else	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :60:21]
+            idata_reg <= {idata_reg[27:0], _di_buf_din};	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :126:{27,37}, src/main/scala/ysyxSoC/TriState.scala:32:21]
+          if (_psram_cmd_io_io_rvalid_T) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:40]
+            if (_psram_cmd_io_io_rvalid_T_1) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:65]
+              state_t <= 3'h3;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :96:19]
+              counter <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :47:26]
+            end
+            else	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:65]
+              counter <= counter + 8'h1;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :67:30, :100:30]
+          end
+          else begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:40]
+            if (_GEN_4)	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26, :60:21, :104:33, :106:19, :119:33, :121:19]
+              state_t <= 3'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26]
+            if (_GEN_2) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:60:21]
+              if (_psram_cmd_io_io_wvalid_T_1)	// @[src/main/scala/ysyxSoC/PSRAM.scala:53:66]
+                counter <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :47:26]
+              else	// @[src/main/scala/ysyxSoC/PSRAM.scala:53:66]
+                counter <= counter + 8'h4;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :90:30, :111:30]
+            end
+            else if (_psram_cmd_io_io_wvalid_T) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:53:40]
+              if (_psram_cmd_io_io_wvalid_T_1)	// @[src/main/scala/ysyxSoC/PSRAM.scala:53:66]
+                counter <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :47:26]
+              else	// @[src/main/scala/ysyxSoC/PSRAM.scala:53:66]
+                counter <= counter + 8'h4;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :90:30, :127:30]
+            end
+          end
+        end
+      end
+      else if (_GEN_5) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:62:22]
+        addr_reg <= {addr_reg[19:0], _di_buf_din};	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27, :65:{26,35}, src/main/scala/ysyxSoC/TriState.scala:32:21]
+        state_t <= 3'h1;	// @[src/main/scala/ysyxSoC/PSRAM.scala:46:26]
+        counter <= 8'h0;	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :47:26]
+      end
+      else	// @[src/main/scala/ysyxSoC/PSRAM.scala:62:22]
+        counter <= counter + 8'h1;	// @[src/main/scala/ysyxSoC/PSRAM.scala:47:26, :67:30]
+      if (~(~(|state_t) | _GEN_0)) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27, :46:26, :60:21]
+        if (_psram_cmd_io_io_rvalid_T) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:40]
+          if (_psram_cmd_io_io_rvalid_T_1)	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:65]
+            data_reg <= {data_reg_hi, data_reg_lo};	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27, :98:26]
+        end
+        else if (~_GEN_2 | _psram_cmd_io_io_wvalid_T_1) begin	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27, :53:66, :60:21, :104:33]
+        end
+        else	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27, :60:21, :104:33]
+          data_reg <= {data_reg[27:0], 4'h0};	// @[src/main/scala/ysyxSoC/PSRAM.scala:38:22, :42:27, :114:{26,35}]
+      end
+    end
+  end // always @(posedge)
+  `ifdef ENABLE_INITIAL_REG_
+    `ifdef FIRRTL_BEFORE_INITIAL
+      `FIRRTL_BEFORE_INITIAL
+    `endif // FIRRTL_BEFORE_INITIAL
+    logic [31:0] _RANDOM[0:3];
+    initial begin
+      `ifdef INIT_RANDOM_PROLOG_
+        `INIT_RANDOM_PROLOG_
+      `endif // INIT_RANDOM_PROLOG_
+      `ifdef RANDOMIZE_REG_INIT
+        for (logic [2:0] i = 3'h0; i < 3'h4; i += 3'h1) begin
+          _RANDOM[i[1:0]] = `RANDOM;
+        end
+        cmd_reg = _RANDOM[2'h0][11:4];	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26]
+        addr_reg = {_RANDOM[2'h0][31:12], _RANDOM[2'h1][3:0]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :41:27]
+        data_reg = {_RANDOM[2'h1][31:4], _RANDOM[2'h2][3:0]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:41:27, :42:27]
+        idata_reg = {_RANDOM[2'h2][31:4], _RANDOM[2'h3][3:0]};	// @[src/main/scala/ysyxSoC/PSRAM.scala:42:27, :43:28]
+        state_t = _RANDOM[2'h3][6:4];	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :46:26]
+        counter = _RANDOM[2'h3][14:7];	// @[src/main/scala/ysyxSoC/PSRAM.scala:43:28, :47:26]
+      `endif // RANDOMIZE_REG_INIT
+    end // initial
+    `ifdef FIRRTL_AFTER_INITIAL
+      `FIRRTL_AFTER_INITIAL
+    `endif // FIRRTL_AFTER_INITIAL
+  `endif // ENABLE_INITIAL_REG_
+  TriStateInBuf #(
+    .width(4)
+  ) di_buf (	// @[src/main/scala/ysyxSoC/TriState.scala:32:21]
+    .dio    (io_dio),
+    .dout   (dread),	// @[src/main/scala/ysyxSoC/PSRAM.scala:34:19]
+    .out_en (~ren),	// @[src/main/scala/ysyxSoC/PSRAM.scala:33:21, :35:41]
+    .din    (_di_buf_din)
+  );
+  psram_cmd psram_cmd_io (	// @[src/main/scala/ysyxSoC/PSRAM.scala:48:30]
+    .clk    (io_sck),
+    .rst    (io_ce_n),
+    .rvalid
+      (_psram_cmd_io_io_rvalid_T & _psram_cmd_io_io_rvalid_T_1
+       & _psram_cmd_io_io_rvalid_T_3),	// @[src/main/scala/ysyxSoC/PSRAM.scala:52:{40,65,74,86}]
+    .wvalid
+      (_psram_cmd_io_io_wvalid_T & _psram_cmd_io_io_wvalid_T_1
+       & _psram_cmd_io_io_wvalid_T_3),	// @[src/main/scala/ysyxSoC/PSRAM.scala:53:{40,66,76,88}]
+    .addr   ({8'h0, addr_reg}),	// @[src/main/scala/ysyxSoC/PSRAM.scala:39:26, :41:27, :55:26]
+    .idata  (data_bswap),	// @[src/main/scala/ysyxSoC/PSRAM.scala:44:25]
+    .odata  (_psram_cmd_io_odata)
+  );
+endmodule
 
 // external module sdram
 
@@ -4660,14 +4851,14 @@ module ysyxSoCFull(
   wire [1:0]  _asic_sdram_ba;	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
   wire [1:0]  _asic_sdram_dqm;	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
   wire [63:0] _asic_io_pc;	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
-  wire [3:0]  _dio_wire;	// @[src/main/scala/ysyxSoC/SoC.scala:147:23]
+  wire [3:0]  _io_dio_wire;	// @[src/main/scala/ysyxSoC/SoC.scala:147:23]
   wire [15:0] _dq_wire;	// @[src/main/scala/ysyxSoC/SoC.scala:149:23]
   ysyxSoCASIC asic (	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
     .clock      (clock),
     .reset      (reset),
     .spi_miso   (_bitrev_io_miso & _flash_miso),	// @[src/main/scala/ysyxSoC/SoC.scala:139:23, :142:24, :145:69]
     .uart_rx    (externalPins_uart_rx),
-    .psram_dio  (_dio_wire),
+    .psram_dio  (_io_dio_wire),
     .sdram_dq   (_dq_wire),
     .gpio_in    (externalPins_gpio_in),
     .ps2_clk    (externalPins_ps2_clk),
@@ -4717,10 +4908,10 @@ module ysyxSoCFull(
     .io_mosi (_asic_spi_mosi),	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
     .io_miso (_bitrev_io_miso)
   );
-  psram psram (	// @[src/main/scala/ysyxSoC/SoC.scala:147:23]
-    .sck  (_asic_psram_sck),	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
-    .ce_n (_asic_psram_ce_n),	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
-    .dio  (_dio_wire)
+  psramChisel psram (	// @[src/main/scala/ysyxSoC/SoC.scala:147:23]
+    .io_sck  (_asic_psram_sck),	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
+    .io_ce_n (_asic_psram_ce_n),	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
+    .io_dio  (_io_dio_wire)
   );
   sdram sdram (	// @[src/main/scala/ysyxSoC/SoC.scala:149:23]
     .clk (_asic_sdram_clk),	// @[src/main/scala/ysyxSoC/SoC.scala:106:24]
@@ -4784,6 +4975,48 @@ import "DPI-C" function void mrom_read(input int raddr, output longint rdata);
 always @(*) begin
   if (ren) mrom_read(raddr, rdata);
   else rdata = 0;
+end
+endmodule
+    
+
+// ----- 8< ----- FILE "./TriStateInBuf.v" ----- 8< -----
+
+module TriStateInBuf #(
+  parameter width = 1
+)(
+    inout  [width-1:0] dio,
+    input  [width-1:0] dout,
+    input              out_en,
+    output [width-1:0] din
+);
+  assign din = dio;
+  assign dio = out_en ? dout : {width{1'bz}};
+endmodule
+    
+
+// ----- 8< ----- FILE "./psram_cmd.v" ----- 8< -----
+
+
+import "DPI-C" function void psram_read(input int addr, output int odata);
+
+import "DPI-C" function void psram_write(input int addr, input int idata);
+
+module psram_cmd(
+input clk,
+input rst,
+input rvalid,
+input wvalid,
+input [31:0] addr,
+output reg [31:0] odata,
+input [31:0] idata);
+
+always @(posedge clk or posedge rst) begin
+  if(rvalid && !rst) begin 
+    psram_read(addr, odata);
+  end 
+  if(wvalid && !rst) begin
+    psram_write(addr, idata);
+  end
 end
 endmodule
     
