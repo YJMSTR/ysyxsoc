@@ -1,0 +1,22 @@
+{
+    "value": {
+        "seenScripts": [
+            [
+                "/home/yjmstr/ysyx-workbench/ysyxSoC/build.sc",
+                ""
+            ]
+        ],
+        "repos": [],
+        "ivyDeps": [],
+        "importGraphEdges": [
+            [
+                "/home/yjmstr/ysyx-workbench/ysyxSoC/build.sc",
+                []
+            ]
+        ],
+        "errors": [],
+        "millImport": false
+    },
+    "valueHash": 1615555190,
+    "inputsHash": -747633182
+}

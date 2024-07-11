@@ -1,0 +1,32 @@
+{
+    "value": {
+        "millbuild.MiscInfo_build$#<init>()void": -636689034,
+        "millbuild.MiscInfo_build$#millBaseModuleInfo$lzycompute()mill.main.RootModule$Info": -760774965,
+        "millbuild.MiscInfo_build$#millBaseModuleInfo()mill.main.RootModule$Info": 2037284758,
+        "millbuild.MiscInfo_build$#millBuildRootModuleInfo$lzycompute()mill.runner.MillBuildRootModule$Info": -32088964,
+        "millbuild.MiscInfo_build$#millBuildRootModuleInfo()mill.runner.MillBuildRootModule$Info": -623247675,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$1()scala.Tuple2": -1032704083,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$10(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -1041341629,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$11(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -512615016,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$12(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -2134344241,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$13(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": 1105955085,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$2(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -1083021074,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$3(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": 1804453218,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$4(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -2062923810,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$5(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": 679454354,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$6(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -354324567,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$7(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": -1796245270,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$8(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": 1096988026,
+        "millbuild.MiscInfo_build$.$anonfun$millBaseModuleInfo$9(millbuild.build,scala.collection.immutable.Seq)mill.define.Command": 312214289,
+        "millbuild.MiscInfo_build$.$anonfun$millBuildRootModuleInfo$1(java.lang.String)os.Path": -370911581,
+        "millbuild.MiscInfo_build$.$deserializeLambda$(java.lang.invoke.SerializedLambda)java.lang.Object": 817801551,
+        "millbuild.MiscInfo_build$.<clinit>()void": -2124669958,
+        "millbuild.MiscInfo_build.millBaseModuleInfo()mill.main.RootModule$Info": -1436493365,
+        "millbuild.MiscInfo_build.millBuildRootModuleInfo()mill.runner.MillBuildRootModule$Info": 2139814636,
+        "millbuild.build#<init>()void": -1509512220,
+        "millbuild.build$#<init>()void": -2145978094,
+        "millbuild.build$.<clinit>()void": 482233898
+    },
+    "valueHash": -1976798994,
+    "inputsHash": -1616230987
+}
