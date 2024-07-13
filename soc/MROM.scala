@@ -30,7 +30,7 @@ class MROMHelper extends BlackBox with HasBlackBoxInline {
 }
 
 class AXI4MROM(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModule {
-  val beatBytes = 4
+  val beatBytes = 8
   val node = AXI4SlaveNode(Seq(AXI4SlavePortParameters(
     Seq(AXI4SlaveParameters(
         address       = address,

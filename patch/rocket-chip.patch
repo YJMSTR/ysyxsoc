@@ -19,7 +19,7 @@ index 3cda29ac..b7bd0ac7 100644
 -        "-disable-infer-rw",
 +        //"-disable-infer-rw",
          "--disable-annotation-unknown",
-         "-dedup",
+         //"-dedup",
          "-O=debug",
 -        "--split-verilog",
 +        //"--split-verilog",
