@@ -64,7 +64,12 @@ class psramChisel extends Module {
     psram_cmd_io.io.rst := reset
     psram_cmd_io.io.rvalid := (state_t === waitr_t) && (counter === 5.U) && (cmd_reg === "xEB".U) // 只会生效一个周期
     psram_cmd_io.io.wvalid := (cmd_reg === "x38".U) && io.ce_n && !next_io_ce_n
-
+    psram_cmd_io.io.wmask := MuxLookup(data_counter, 7.U)(Seq(
+        28.U -> 15.U,
+        12.U -> 3.U, 
+        4.U -> 1.U
+      ))
+      //data_counter >> 3.U;
 
     psram_cmd_io.io.addr := addr_reg
 
@@ -87,9 +92,7 @@ class psramChisel extends Module {
         }
       }
       is(addr_t) {
-        
         when(counter === 20.U) {
-
           when (cmd_reg === "xEB".U) {
             state_t := waitr_t
             counter := 0.U
@@ -133,10 +136,8 @@ class psramChisel extends Module {
       } 
       is(w_data_t) {
         ren := 1.B
-
         data_counter := data_counter + 4.U
         idata_reg := Cat(idata_reg(27, 0), di)
-
         when (next_io_ce_n2) {
           // 说明已经进入了下一条 sck 命令的接收过程的第一个周期
           counter := 1.U
@@ -149,7 +150,6 @@ class psramChisel extends Module {
           ren := 0.B
         }
       }
-
       is(err_t){
         printf("psram err at psram.scala\n");
         printf("cmd = %x\n", cmd_reg)
@@ -163,6 +163,7 @@ class psram_cmd extends BlackBox with HasBlackBoxInline {
     val rst = Input(Bool())
     val rvalid = Input(Bool())
     val wvalid = Input(Bool())
+    val wmask = Input(UInt(8.W))
     val bvalid = Output(Bool())
     val bready = Input(Bool())
     //val wen   = Input(Bool())
@@ -175,13 +176,14 @@ class psram_cmd extends BlackBox with HasBlackBoxInline {
     """
     |import "DPI-C" function void psram_read(input int addr, output int odata);
     |
-    |import "DPI-C" function void psram_write(input int addr, input int idata);
+    |import "DPI-C" function void psram_write(input int addr, input int idata, input byte wmask);
     |
     |module psram_cmd(
     |input clk,
     |input rst,
     |input rvalid,
     |input wvalid,
+    |input [7:0] wmask,
     |input [31:0] addr,
     |output reg [31:0] odata,
     |output reg bvalid,
@@ -193,7 +195,7 @@ class psram_cmd extends BlackBox with HasBlackBoxInline {
     |    psram_read(addr, odata);
     |  end 
     |  if (wvalid && !rst && !bvalid) begin
-    |    psram_write(addr, idata);
+    |    psram_write(addr, idata, wmask);
     |    bvalid <= 1'b1;
     |  end
     |  if (bvalid & bready) begin 
