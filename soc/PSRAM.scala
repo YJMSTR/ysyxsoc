@@ -66,7 +66,7 @@ class psramChisel extends Module {
     psram_cmd_io.io.wvalid := (cmd_reg === "x38".U) && io.ce_n && !next_io_ce_n
     psram_cmd_io.io.wmask := MuxLookup(data_counter, 7.U)(Seq(
         28.U -> 15.U,
-        12.U -> 3.U, 
+        12.U -> 3.U,
         4.U -> 1.U
       ))
       //data_counter >> 3.U;

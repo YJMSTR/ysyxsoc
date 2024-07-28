@@ -72,11 +72,11 @@ class APBSPI(address: Seq[AddressSet])(implicit p: Parameters) extends LazyModul
     mspi.io.in.psel       := r_psel
     mspi.io.in.penable    := r_penable
     mspi.io.in.pprot      := r_pprot
-    mspi.io.in.pwrite     := r_pwrite 
-    mspi.io.in.pwdata     := r_pwdata 
-    mspi.io.in.pstrb      := r_pstrb  
-    r_pready              := mspi.io.in.pready 
-    r_prdata              := mspi.io.in.prdata 
+    mspi.io.in.pwrite     := r_pwrite
+    mspi.io.in.pwdata     := r_pwdata
+    mspi.io.in.pstrb      := r_pstrb
+    r_pready              := mspi.io.in.pready
+    r_prdata              := mspi.io.in.prdata
     r_pslverr             := mspi.io.in.pslverr
     in.pready             := r_o_pready
     in.prdata             := r_o_prdata
