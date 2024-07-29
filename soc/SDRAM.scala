@@ -115,7 +115,7 @@ class sdramChisel extends RawModule {
     sdram_cmd_io.io.clk := (io.clk).asClock
     sdram_cmd_io.io.rvalid := ren
     sdram_cmd_io.io.wvalid := wen
-    sdram_cmd_io.io.bank   := Cat(0.U(8.W), bankid)
+    sdram_cmd_io.io.bank   := Cat(0.U(8.W), active_bank)
     sdram_cmd_io.io.row    := Cat(0.U(3.W), active_row(active_bank))
     sdram_cmd_io.io.col    := Cat(0.U(6.W), active_col(active_bank))
     data_read := sdram_cmd_io.io.odata
@@ -169,7 +169,18 @@ class sdramChisel extends RawModule {
             s_state := s_write
             burst_counter := 2.U
             active_col(active_bank) := addr(9,0)+1.U // 直接计算出下一个 beat 的地址
-            // 如果当前 beat 是某一 row 的最后一个元素怎么办
+            // 如果当前 beat 是某一 row 的最后一个元素怎么办 特判
+            when (addr(9, 0) + 1.U === 512.U) {
+              active_col(active_bank) := 0.U
+              when (addr(9, 0) + 1.U === 8192.U) {
+                active_row(active_bank + 1.U) := 0.U
+                active_bank := active_bank + 1.U
+              }.otherwise {
+                active_row(active_bank) := active_row(active_bank) + 1.U
+              }
+            }.otherwise{
+              active_col(active_bank) := addr(9, 0) + 1.U
+            }
           }
         }.elsewhen (cmd === "b0110".U) {
           // burst terminate
@@ -213,6 +224,17 @@ class sdramChisel extends RawModule {
           burst_counter := burst_counter + 1.U
           // 先读的低字节
           active_col(active_bank) := active_col(active_bank) + 1.U
+          when (active_col(active_bank) + 1.U === 512.U) {
+            active_col(active_bank) := 0.U
+            when (active_row(active_bank) + 1.U === 8192.U) {
+              active_row(active_bank + 1.U) := 0.U
+              active_bank := active_bank + 1.U
+            }.otherwise {
+              active_row(active_bank) := active_row(active_bank) + 1.U
+            }
+          }.otherwise{
+            active_col(active_bank) := active_col(active_bank) + 1.U
+          }
         }
       }
       // 最多一次写 32 位数据，分成两次 write
@@ -225,8 +247,18 @@ class sdramChisel extends RawModule {
           s_state := s_idle
         }.otherwise{
           burst_counter := burst_counter + 1.U
-          // 如果是某个 row 的最后一个 col 怎么办
-          active_col(active_bank) := active_col(active_bank) + 1.U
+          // 如果是某个 row 的最后一个 col 怎么办，特判一下
+          when (active_col(active_bank) + 1.U === 512.U) {
+            active_col(active_bank) := 0.U
+            when (active_row(active_bank) + 1.U === 8192.U) {
+              active_row(active_bank + 1.U) := 0.U
+              active_bank := active_bank + 1.U
+            }.otherwise {
+              active_row(active_bank) := active_row(active_bank) + 1.U
+            }
+          }.otherwise{
+            active_col(active_bank) := active_col(active_bank) + 1.U
+          }
         }
       }
     }
