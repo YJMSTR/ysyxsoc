@@ -172,7 +172,7 @@ class sdramChisel extends RawModule {
             // 如果当前 beat 是某一 row 的最后一个元素怎么办 特判
             when (addr(9, 0) + 1.U === 512.U) {
               active_col(active_bank) := 0.U
-              when (addr(9, 0) + 1.U === 8192.U) {
+              when (active_row(active_bank) + 1.U === 8192.U) {
                 active_row(active_bank + 1.U) := 0.U
                 active_bank := active_bank + 1.U
               }.otherwise {
