@@ -135,7 +135,7 @@ class ysyxSoCFull(implicit p: Parameters) extends LazyModule {
     val io_pc = IO(Output(UInt(64.W)))
     io_pc := masic.io_pc 
     val io_npc = IO(Output(UInt(64.W)))
-    io_npc := masic.io_pc
+    io_npc := masic.io_npc
     val flash = Module(new flash)
     flash.io <> masic.spi
     flash.io.ss := masic.spi.ss(0)

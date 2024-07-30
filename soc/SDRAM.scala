@@ -140,7 +140,8 @@ class sdramChisel extends RawModule {
           active_row(bankid) := addr
         }.elsewhen (cmd === "b0101".U) {
           // read
-          active_col(active_bank) := addr(9, 0)
+          active_bank := bankid
+          active_col(bankid) := addr(9, 0)
           s_state := s_read
           cas_counter := 2.U
           burst_counter := 0.U
@@ -152,7 +153,8 @@ class sdramChisel extends RawModule {
           // sdram 控制器将 axi4 上的一次写事务拆分为两次连续的 sdram 写操作
           // 第一次写操作写入低半字，第二次写操作写入高半字
           // 不实现 write 的突发传输？
-          active_col(active_bank) := addr(9, 0)
+          active_bank := bankid
+          active_col(bankid) := addr(9, 0)
           sdram_cmd_io.io.col := Cat(0.U(6.W), addr(9, 0))
           mask := Cat(0.U(6.W), ~io.dqm)
           sdram_cmd_io.io.mask := Cat(0.U(6.W), ~io.dqm)
@@ -220,6 +222,8 @@ class sdramChisel extends RawModule {
         ren := 1.B
         when (burst_counter === burst_length) {
           s_state := s_idle
+          cas_counter := 0.U 
+          burst_counter := 0.U
         }.otherwise {
           burst_counter := burst_counter + 1.U
           // 先读的低字节
@@ -245,6 +249,7 @@ class sdramChisel extends RawModule {
         sdram_cmd_io.io.mask := Cat(0.U(6.W), ~io.dqm)
         when (burst_counter === burst_length) {
           s_state := s_idle
+          burst_counter := 0.U
         }.otherwise{
           burst_counter := burst_counter + 1.U
           // 如果是某个 row 的最后一个 col 怎么办，特判一下
@@ -294,11 +299,11 @@ class sdram_cmd extends BlackBox with HasBlackBoxInline {
     |always @(posedge clk) begin
     |  if (rvalid) begin
     |    sdram_read(bank, row, col, odata, mask);
-    |    $display("soc sdram_cmd_io read bank=%x row=%x col=%x odata=%x mask=%x\n", bank, row, col, odata, mask);
+    |    //$display("soc sdram_cmd_io read bank=%x row=%x col=%x odata=%x mask=%x\n", bank, row, col, odata, mask);
     |  end
     |  if (wvalid) begin
     |    sdram_write(bank, row, col, idata, mask);
-    |    $display("soc sdram_cmd_io write bank=%x row=%x col=%x idata=%x mask=%x\n", bank, row, col, idata, mask);
+    |    //$display("soc sdram_cmd_io write bank=%x row=%x col=%x idata=%x mask=%x\n", bank, row, col, idata, mask);
     |  end
     |end
     |endmodule
