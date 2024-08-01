@@ -61,10 +61,12 @@ class sdramChisel extends RawModule {
     val ren_reg = RegNext(ren)
     val data_write = TriStateInBuf(io.dq, data_read, ren)
     val idata_reg = RegInit(0.U(16.W))
-    val active_bank = RegInit(0.U(2.W)) 
+    val active_bank = RegInit(0.U(2.W))
     // use reg of vec not vec of reg
     val active_row  = RegInit(VecInit(Seq.fill(4)(0.U(13.W))))
-    val active_col  = RegInit(VecInit(Seq.fill(4)(0.U(10.W))))  // 一共 512 列，a[10] 用于标识是否 autocharge
+    val active_col  = RegInit(0.U(10.W))  // 一共 512 列，a[10] 用于标识是否 autocharge
+    val currow = RegInit(0.U(13.W))
+    val curbank = RegInit(0.U(2.W))
     val mode_register = RegInit(0.U(13.W))
     // cas latency
     // 2 -> 2
@@ -115,9 +117,9 @@ class sdramChisel extends RawModule {
     sdram_cmd_io.io.clk := (io.clk).asClock
     sdram_cmd_io.io.rvalid := ren
     sdram_cmd_io.io.wvalid := wen
-    sdram_cmd_io.io.bank   := Cat(0.U(8.W), active_bank)
-    sdram_cmd_io.io.row    := Cat(0.U(3.W), active_row(active_bank))
-    sdram_cmd_io.io.col    := Cat(0.U(6.W), active_col(active_bank))
+    sdram_cmd_io.io.bank   := Cat(0.U(8.W), curbank)
+    sdram_cmd_io.io.row    := Cat(0.U(3.W), currow)
+    sdram_cmd_io.io.col    := Cat(0.U(6.W), active_col)
     data_read := sdram_cmd_io.io.odata
     sdram_cmd_io.io.idata  := 0.U
     sdram_cmd_io.io.mask   := mask
@@ -138,24 +140,30 @@ class sdramChisel extends RawModule {
           // active
           active_bank := bankid
           active_row(bankid) := addr
+          curbank := bankid
+          currow := addr
         }.elsewhen (cmd === "b0101".U) {
           // read
           active_bank := bankid
-          active_col(bankid) := addr(9, 0)
+          active_col := addr(9, 0)
+          curbank := bankid
+    
           s_state := s_read
           cas_counter := 2.U
           burst_counter := 0.U
           mask := Cat(0.U(6.W), ~io.dqm)
           sdram_cmd_io.io.mask := Cat(0.U(6.W), ~io.dqm)
-          
+          currow := active_row(bankid)
         }.elsewhen (cmd === "b0100".U) {
           // write 收到命令的同时进行写入
           // sdram 控制器将 axi4 上的一次写事务拆分为两次连续的 sdram 写操作
           // 第一次写操作写入低半字，第二次写操作写入高半字
-          // 不实现 write 的突发传输？
           active_bank := bankid
+          currow := active_row(bankid)
+          curbank := bankid
+          sdram_cmd_io.io.row := active_row(bankid)
           sdram_cmd_io.io.bank := bankid
-          active_col(bankid) := addr(9, 0)
+          active_col := addr(9, 0)
           sdram_cmd_io.io.col := Cat(0.U(6.W), addr(9, 0))
           mask := Cat(0.U(6.W), ~io.dqm)
           sdram_cmd_io.io.mask := Cat(0.U(6.W), ~io.dqm)
@@ -168,21 +176,22 @@ class sdramChisel extends RawModule {
             // 当前周期就完成了写
             s_state := s_idle
             // 便于接收下一个指令
+          //下面仅支持长度为2的突发写 
           }.otherwise {
             s_state := s_write
             burst_counter := 2.U
-            active_col(active_bank) := addr(9,0)+1.U // 直接计算出下一个 beat 的地址
+            active_col := addr(9,0)+1.U // 直接计算出下一个 beat 的地址
             // 如果当前 beat 是某一 row 的最后一个元素怎么办 特判
             when (addr(9, 0) + 1.U === 512.U) {
-              active_col(active_bank) := 0.U
-              when (active_row(active_bank) + 1.U === 8192.U) {
-                active_row(active_bank + 1.U) := 0.U
-                active_bank := active_bank + 1.U
+              active_col := 0.U
+              when (currow + 1.U === 8192.U) {
+                currow := 0.U
+                curbank := bankid + 1.U
               }.otherwise {
-                active_row(active_bank) := active_row(active_bank) + 1.U
+                currow := addr(9, 0) + 1.U
               }
             }.otherwise{
-              active_col(active_bank) := addr(9, 0) + 1.U
+              active_col := addr(9, 0) + 1.U
             }
           }
         }.elsewhen (cmd === "b0110".U) {
@@ -218,8 +227,6 @@ class sdramChisel extends RawModule {
         }
       }
       is(s_read) {
-        // 暂时不需要实现流水线读？因为突发读可以满足需求
-        // 暂时不需要实现 command inhibit？
         ren := 1.B
         when (burst_counter === burst_length) {
           s_state := s_idle
@@ -228,17 +235,16 @@ class sdramChisel extends RawModule {
         }.otherwise {
           burst_counter := burst_counter + 1.U
           // 先读的低字节
-          active_col(active_bank) := active_col(active_bank) + 1.U
-          when (active_col(active_bank) + 1.U === 512.U) {
-            active_col(active_bank) := 0.U
-            when (active_row(active_bank) + 1.U === 8192.U) {
-              active_row(active_bank + 1.U) := 0.U
-              active_bank := active_bank + 1.U
+          when (active_col + 1.U === 512.U) {
+            active_col := 0.U
+            when (currow + 1.U === 8192.U) {
+              currow := 0.U
+              curbank := curbank + 1.U
             }.otherwise {
-              active_row(active_bank) := active_row(active_bank) + 1.U
+              currow := currow + 1.U
             }
           }.otherwise{
-            active_col(active_bank) := active_col(active_bank) + 1.U
+            active_col := active_col + 1.U
           }
         }
       }
@@ -252,19 +258,8 @@ class sdramChisel extends RawModule {
           s_state := s_idle
           burst_counter := 0.U
         }.otherwise{
-          burst_counter := burst_counter + 1.U
-          // 如果是某个 row 的最后一个 col 怎么办，特判一下
-          when (active_col(active_bank) + 1.U === 512.U) {
-            active_col(active_bank) := 0.U
-            when (active_row(active_bank) + 1.U === 8192.U) {
-              active_row(active_bank + 1.U) := 0.U
-              active_bank := active_bank + 1.U
-            }.otherwise {
-              active_row(active_bank) := active_row(active_bank) + 1.U
-            }
-          }.otherwise{
-            active_col(active_bank) := active_col(active_bank) + 1.U
-          }
+          // 下面这段其实根本不会进来
+  
         }
       }
     }
