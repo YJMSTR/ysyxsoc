@@ -154,6 +154,7 @@ class sdramChisel extends RawModule {
           // 第一次写操作写入低半字，第二次写操作写入高半字
           // 不实现 write 的突发传输？
           active_bank := bankid
+          sdram_cmd_io.io.bank := bankid
           active_col(bankid) := addr(9, 0)
           sdram_cmd_io.io.col := Cat(0.U(6.W), addr(9, 0))
           mask := Cat(0.U(6.W), ~io.dqm)
